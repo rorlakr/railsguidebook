@@ -65,8 +65,7 @@ $ bin/rails g uploader Picture
       create  app/uploaders/picture_uploader.rb
 ```
 
-생성된 `PictureUploader` 클래스 파일의 내용은 아래와 같다
-
+생성된 `PictureUploader` 클래스 파일(app/uploaders/picture_uploader.rb)의 내용은 아래와 같다.
 
 ```ruby
 # encoding: utf-8
@@ -175,7 +174,7 @@ $ bin/rake db:migrate
 
 ### 업로더 마운트하기
 
-`Post` 클래스 파일(`app/models/post.rb`)을 열어 `PictureUploader`  업로더 클래스를 `picture` 속성으로 마우트한다.
+`Post` 클래스 파일(`app/models/post.rb`)을 열어 `PictureUploader`  업로더 클래스를 `picture` 속성으로 마운트한다.
 
 ```ruby
 class Post < ActiveRecord::Base
@@ -237,9 +236,21 @@ end
 
 위에서 `erb` 코드 부분을 보면, `gallery`형 게시판에서만 이미지를 업로드할 수 있도록 조건을 추가한 것을 주목하자.
 
+### Strong parameters
+
+새로 추가한 `picture`와 `picture_cache` 속성에 대한 접근을 허가하기 위해 posts 컨트롤러의 `post_paramas`를 다음과 같이 수정하자. 해당 속성을 허용하지 않으면 이미지 파일을 업로드하는 과정에서 로그에 `Unpermitted parameters: picture, picture_cache`라는 오류 메시지가 남는다.
+
+``` ruby
+...
+  def post_params
+    params.require(:post).permit(:title, :content, :picture, :picture_cache)
+  end
+...
+```
+
 ### 갤러리 게시판을 생성
 
-우선 게시판 생성시 `Post type`에 `gallery` 옵션을 추가하기 위해 아래와 같이 변경한다.
+우선 게시판 생성시 `Post type`에 `gallery` 옵션을 추가하기 위해 `bulletins`의 form 파셜 템플릿 `_form.html.erb(app/view/bulletins/_form.html.erb)`를 아래와 같이 변경한다.
 
 ```erb
 ...
@@ -298,8 +309,7 @@ end
 
 ![](http://i1373.photobucket.com/albums/ag392/rorlab/Photobucket%20Desktop%20-%20RORLAB/rcafe/2014-05-17_12-31-35_zps0d325841.png)
 
-
-또한, 업로더 클래스에 아래와 같이 업로드할 수 있는 파일 포맷을 지정할 수 있다.
+필요하다면 업로더 클래스에 업로드할 수 있는 파일 형식을 지정할 수 있다. 이렇게 하면 `.jpg`, `.jpeg`, `.gif`, `.png`, `.pdf` 확장자를 가진 파일만 업로드할 수 있게 된다.
 
 ```ruby
 ...
@@ -309,9 +319,9 @@ end
 ...
 ```
 
-이제 `.jpg`, `.jpeg`, `.gif`, `.png`, `.pdf` 확장자를 가진 파일만 업로드할 수 있게 된다.
+지정한 파일확장자 이외의 파일을 업로드하면 아래와 같은 에러 메시지가 표시된다.
 
-이러한 파일확장자 이외의 파일을 업로드하면 아래와 같은 에러 메시지가 표시된다.
+![](http://i1373.photobucket.com/albums/ag392/rorlab/Photobucket%20Desktop%20-%20RORLAB/2014-05-17_21-25-04_zps0d9549a7.png)
 
 에러 메시지를 위한 `CSS`를 추가하기 위해 `app/assets/stylesheets/`  디렉토리에 `custom.css.scss` 파일을 생성하고 아래와 같이 추가한다.
 
@@ -329,9 +339,6 @@ end
   border: 1px solid #7d0505 !important;
 }
 ```
-
-![](http://i1373.photobucket.com/albums/ag392/rorlab/Photobucket%20Desktop%20-%20RORLAB/2014-05-17_21-25-04_zps0d9549a7.png)
-
 `.pdf` 파일을 업로드하면 첫페이지의 이미지가 쎔네일로 만들어진다.
 
 ![](http://i1373.photobucket.com/albums/ag392/rorlab/Photobucket%20Desktop%20-%20RORLAB/rcafe/2014-05-17_16-00-09_zps7a9c5c52.png)
