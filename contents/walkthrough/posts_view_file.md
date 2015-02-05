@@ -62,7 +62,7 @@
 
 ### welcome#index 뷰 파일 변경
 
-`welcome` 컨틀로러의 `index` 액션 뷰 파일(`app/views/welcome/index.html.erb')을 열고 `posts_path`를 bulletin_posts_path(1)`로 변경한다. 이것은 `공지사항` 게시판으로 이동하기 위한 것이다.
+`welcome` 컨트롤러의 `index` 액션 뷰 파일(`app/views/welcome/index.html.erb')을 열고 `posts_path`를 bulletin_posts_path(1)`로 변경한다. 이것은 `공지사항` 게시판으로 이동하기 위한 것이다.
 
 ```html
 <%= link_to "글작성", bulletin_posts_path(1), class:'btn btn-default' %>
@@ -104,12 +104,49 @@
 | 2 | 새소식 |
 | 3 | 가입인사 |
 
-
 우리가 의도한 바는 상단 메뉴 항목를 클릭하면 해당 게시판으로 이동하고 해당 항목이 주황색의 글씨로 표시되도록 하는 것이다.
-
 
 ![](http://i1373.photobucket.com/albums/ag392/rorlab/Photobucket%20Desktop%20-%20RORLAB/rcafe/2015-01-30_22-02-30_zpsb40d5eb8.png)
 
+### 게시판 ID 찾아내서 할당하기
+
+생성 순서에 따라 게시판 ID는 달라질 수 있다. 레일스가 레코드를 생성할 때 ID를 자동으로 할당하기 때문이다. DB에 직접 접속해서 알맞은 게시판 ID(`bulletin_id`) 값을 알아내서 할당해야 한다. 레일즈 서버를 잠시 중단하고 DB에 접속한다.
+
+``` bash
+$ bin/rails db
+SQLite version 3.8.2 2013-12-06 14:53:30
+Enter ".help" for instructions
+Enter SQL statements terminated with a ";"
+sqlite>
+```
+
+`.tables`를 입력하면 지금까지 생성한 `bulletins` 테이블과 `posts` 테이블을 확인할 수 있다.
+
+``` bash
+sqlite> .tables
+bulletins          posts              schema_migrations
+```
+
+`bulletins` 테이블에 있는 모든 자료를 `select` 문으로 확인해보자. 앞서 웹 브라우저에서 생성한 공지사항 게시판의 첫 필드 16이 게시판 ID, `bulletin_id` 값을 의미한다.
+
+``` bash
+sqlite> select * from bulletins;
+16|공지사항|공지사항을 올리는 게시판이에요|2015-02-05 02:13:16.303096|2015-02-05 02:13:16.303096|bulletin
+```
+
+이렇게 되면 공지사항 게시판으로 이동하기 위한 `link_to` 메소드에서 `bulletin_id`는 1이 아닌 16으로 변경해야 한다. 공지사항 뿐만아니라 새소식, 가입인사 게시판 모두 마찬가지이다.
+
+``` html
+<ul class="nav navbar-nav">
+  <li class="<%= params[:bulletin_id] == '16' ? 'active' : '' %>"><%= link_to '공지사항', bulletin_posts_path('16') %></li>
+  ...
+```
+
+잊지 말고 `welcome` 컨트롤러의 `index` 액션 뷰 파일도 `bulletin_id`를 수정하자.
+
+```html
+<%= link_to "글작성", bulletin_posts_path(16), class:'btn btn-default' %>
+```
 
 ---
 > **Git소스** https://github.com/rorlakr/rcafe/tree/chapter_05_09
