@@ -62,7 +62,7 @@
 
 ### welcome#index 뷰 파일 변경
 
-`welcome` 컨틀로러의 `index` 액션 뷰 파일(`app/views/welcome/index.html.erb')을 열고 `posts_path`를 bulletin_posts_path(1)`로 변경한다. 이것은 `공지사항` 게시판으로 이동하기 위한 것이다.
+`welcome` 컨트롤러의 `index` 액션 뷰 파일(`app/views/welcome/index.html.erb')을 열고 `posts_path`를 bulletin_posts_path(1)`로 변경한다. 이것은 `공지사항` 게시판으로 이동하기 위한 것이다.
 
 ```html
 <%= link_to "글작성", bulletin_posts_path(1), class:'btn btn-default' %>
@@ -140,6 +140,12 @@ sqlite> select * from bulletins;
 <ul class="nav navbar-nav">
   <li class="<%= params[:bulletin_id] == '16' ? 'active' : '' %>"><%= link_to '공지사항', bulletin_posts_path('16') %></li>
   ...
+```
+
+잊지 말고 `welcome` 컨트롤러의 `index` 액션 뷰 파일도 `bulletin_id`를 수정하자.
+
+```html
+<%= link_to "글작성", bulletin_posts_path(16), class:'btn btn-default' %>
 ```
 
 ---
